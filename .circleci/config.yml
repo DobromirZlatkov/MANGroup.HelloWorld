@@ -10,6 +10,22 @@ jobs:
          name: List files
          command: ls -al
 
+      - run: 
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+
+      - run:
+          name: Install Project Dependencies
+          command: |
+            npm install
+
+      - run:
+          name: Run Tests
+          command: |
+            npm run test
+
       # build image
       - run: |
          docker info
@@ -37,7 +53,7 @@ jobs:
       - run: 
           name: Install Node.js
           command: |
-            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
             sudo apt-get install -y nodejs
 
       - run:

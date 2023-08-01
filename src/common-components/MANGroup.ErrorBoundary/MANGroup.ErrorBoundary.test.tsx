@@ -28,6 +28,6 @@ describe('MANGroup.ErrorBoundary', () => {
         <ErrorComponent />
       </ErrorBoundary>
     )
-    expect(screen.getByText('Sorry... there was an error')).toBeInTheDocument()
+    expect(screen.getByText('Sorry.. there was an error')).toBeInTheDocument()
   })
 })
