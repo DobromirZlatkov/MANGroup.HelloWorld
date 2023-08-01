@@ -75,7 +75,7 @@ jobs:
               docker pull $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
               docker stop dainance-publicportal
               docker rm dainance-publicportal
-              docker run -d -p 3000:80 --name dainance-publicportal $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+              docker run -d -p 6100:80 --name dainance-publicportal $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
             EOF
 
   deploy-develop:
