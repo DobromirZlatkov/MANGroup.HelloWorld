@@ -14,7 +14,7 @@ RUN npm run build
 # Production stage
 FROM nginx:stable-alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/nginx/html
 
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 COPY nginx.conf /etc/nginx/conf.d/default.conf
