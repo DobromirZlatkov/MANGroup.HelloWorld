@@ -1,0 +1,136 @@
+version: 2
+
+jobs:
+  build-master:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+         name: List files
+         command: ls -al
+
+      # build image
+      - run: |
+         docker info
+         docker build -t $DOCKER_REGISTRY_USERNAME/mangroup.helloworld .
+
+      # print image
+      - run: |
+         docker images
+
+      # push the image
+      - run: |
+         docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
+         docker tag $DOCKER_REGISTRY_USERNAME/mangroup.helloworld $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+         docker push $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+
+  build-develop:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+         name: List files
+         command: ls -al
+
+      # build image
+      - run: |
+         docker info
+         docker build -t $DOCKER_REGISTRY_USERNAME/mangroup.helloworld .
+
+      # print image
+      - run: |
+         docker images
+
+      # push the image
+      - run: |
+         docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
+         docker tag $DOCKER_REGISTRY_USERNAME/mangroup.helloworld $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
+         docker push $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
+
+  deploy-master:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: List files
+          command: ls -al
+      - run:
+          name: Install sshpass
+          command: sudo apt-get install -y sshpass
+      - run:
+          name: Copy docker files
+          command: |
+            export SSHPASS=$SSH_PASSWORD
+            echo $SSH_PASSWORD | sshpass -e ssh -o StrictHostKeyChecking=no $SSH_USERNAME@5.104.81.38 'rm -rf ~/mangroup.helloworld/*'
+            echo $SSH_PASSWORD | sshpass -e scp -o StrictHostKeyChecking=no Dockerfile $SSH_USERNAME@5.104.81.38:~/mangroup.helloworld
+      - run:
+          name: Deploy Over SSH
+          command: |
+            export SSHPASS=$SSH_PASSWORD
+            sshpass -e ssh $SSH_USERNAME@5.104.81.38 << EOF
+              cd ~/mangroup.helloworld
+              docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
+              docker pull $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+              docker stop dainance-publicportal
+              docker rm dainance-publicportal
+              docker run -d -p 3000:80 --name dainance-publicportal $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+            EOF
+
+  deploy-develop:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: List files
+          command: ls -al
+      - run:
+          name: Install sshpass
+          command: sudo apt-get install -y sshpass
+      - run:
+          name: Copy docker files
+          command: |
+            export SSHPASS=$SSH_PASSWORD
+            echo $SSH_PASSWORD | sshpass -e ssh -o StrictHostKeyChecking=no $SSH_USERNAME@5.104.81.38 'rm -rf ~/mangroup.helloworld-dev/*'
+            echo $SSH_PASSWORD | sshpass -e scp -o StrictHostKeyChecking=no Dockerfile $SSH_USERNAME@5.104.81.38:~/mangroup.helloworld-dev
+      - run:
+          name: Deploy Over SSH
+          command: |
+            export SSHPASS=$SSH_PASSWORD
+            sshpass -e ssh $SSH_USERNAME@5.104.81.38 << EOF
+              cd ~/mangroup.helloworld-dev
+              docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
+              docker pull $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
+              docker stop dainance-publicportal-dev
+              docker rm dainance-publicportal-dev
+              docker run -d -p 5000:80 --name dainance-publicportal-dev $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
+            EOF
+
+workflows:
+  version: 2
+  build-and-deploy-master:
+    jobs:
+      - build-master:
+          filters:
+            branches:
+              only: master
+      - deploy-master:
+          requires:
+            - build-master
+          filters:
+            branches:
+              only: master
+
+  build-and-deploy-develop:
+    jobs:
+      - build-develop:
+          filters:
+            branches:
+              only: develop
+      - deploy-develop:
+          requires:
+            - build-develop
+          filters:
+            branches:
+              only: develop
