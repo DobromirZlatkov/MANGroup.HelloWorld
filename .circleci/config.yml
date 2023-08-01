@@ -34,6 +34,14 @@ jobs:
          name: List files
          command: ls -al
 
+      - run: 
+          name: Install dependencies and Run tests
+          command: |
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            npm install
+            npm run test
+
       # build image
       - run: |
          docker info
