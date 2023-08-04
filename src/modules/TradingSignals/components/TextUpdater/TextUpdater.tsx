@@ -1,13 +1,21 @@
 import React, { useState, ChangeEvent } from 'react'
+// import { useAppSelector, useAppDispatch } from '../../../../store/hooks'
+
 import Input from '../../../../common-components/MANGroup.Input/MANGroup.Input'
 import Button from '../../../../common-components/MANGroup.Button/MANGroup.Button'
 
 const TextUpdater: React.FC = () => {
   const [text, setText] = useState('Hello World')
+
+  // using redux store
+  // const text = useAppSelector((state) => state.tradingSignals.text)
+  // const dispatch = useAppDispatch()
+
   const [headerText, setHeaderText] = useState('Hello World')
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value)
+    // dispatch(setText(e.target.value))
   }
 
   const handleButtonClick = () => {
