@@ -105,9 +105,9 @@ jobs:
               cd ~/mangroup.helloworld
               docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
               docker pull $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
-              docker stop dainance-publicportal
-              docker rm dainance-publicportal
-              docker run -d -p 6100:80 --name dainance-publicportal $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
+              docker stop mangroup-helloworld
+              docker rm mangroup-helloworld
+              docker run -d -p 6100:80 --name mangroup-helloworld $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:latest
             EOF
 
   deploy-develop:
@@ -134,9 +134,9 @@ jobs:
               cd ~/mangroup.helloworld-dev
               docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_URL
               docker pull $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
-              docker stop dainance-publicportal-dev
-              docker rm dainance-publicportal-dev
-              docker run -d -p 7100:80 --name dainance-publicportal-dev $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
+              docker stop mangroup-helloworld-dev
+              docker rm mangroup-helloworld-dev
+              docker run -d -p 7100:80 --name mangroup-helloworld-dev $DOCKER_REGISTRY_USERNAME/mangroup.helloworld:dev
             EOF
 
 workflows:
